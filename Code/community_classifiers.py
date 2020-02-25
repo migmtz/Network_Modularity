@@ -6,7 +6,7 @@ from scipy.sparse import csc_matrix
 
 # --------------------------- Generate sample graph -------------------------- #
 
-G=networkx.generators.atlas.graph_atlas(100)
+G=networkx.generators.karate_club_graph()
 
 print("Matrice d'adjacence")
 print(to_numpy_matrix(G))
@@ -17,15 +17,18 @@ print(np.sum(to_numpy_matrix(G),axis=1))
 
 class TwoCommunityClassifier():
     
-    def __init__(self,graph):
+    def __init__(self,graph,B=None):
         self.G=graph
         self.A=to_numpy_matrix(graph)
         self.k=np.sum(self.A,axis=1)
         self.m=np.sum(self.k)
-        self.B=self.A-np.dot(self.k,self.k.transpose())/self.m
+        if B is None:
+            self.B=self.A-np.dot(self.k,self.k.transpose())/self.m
+        else:
+            self.B=B
         self.leading_eigenvector=None
         self.category=None
-        self.indivisible=False
+        self.done=False
     
     def fit(self,eps=0.5,max_iteration=1000):
         # Compute the simple power method (TBC)
@@ -45,8 +48,8 @@ class TwoCommunityClassifier():
         #Alternatively, use built in function for eigenvalues
         vals,vecs=eig(self.B)
         self.leading_eigenvector=vecs[:,np.argmax(vals)]
-        if np.max(self.leading_eigenvector)*np.min(self.leading_eigenvector)>=0:
-            self.indivisible=True
+        if np.max(self.leading_eigenvector)*np.min(self.leading_eigenvector)>=0: #All elements of the same sign
+            self.done=True
         self.category={node: 1 if self.leading_eigenvector[i]>=0 else -1  for i,node in enumerate(self.G.nodes)}
         # np.ravel((self.leading_eigenvector>=0).astype(int))
         # self.category[self.category==0]=-1
@@ -66,24 +69,26 @@ class NCommunityClassifier(TwoCommunityClassifier):
         #Apply the Two Communities classification recursively until the communities cannot be divided themselves
         #Careful in the updates of the values
         if subgraph==None:
+            # objet subgraph TBC.
             # first call of the recursive stack 
             clf=TwoCommunityClassifier(self.graph)
             clf.fit()
-            if clf.indivisible:
+            if clf.done:
                 # No need to proceed further
                 return clf.category
             else:
+                pass
                 # self.fit(sub1,sub2)
                 # Apply the recursive step
         else:
             #all subgraphs calls
             clf=TwoCommunityClassifier(self.graph)
             clf.fit()
-            if clf.indivisible:
+            if clf.done:
                 # No need to proceed further
                 return clf.category
             else:
-
+                pass
                 # self.fit(sub1)
 
 
