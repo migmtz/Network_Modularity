@@ -79,17 +79,10 @@ class NCommunityClassifier(TwoCommunityClassifier):
                 self.category[node].append(1 if clf.leading_eigenvector[i]>=0 else -1)
         else:
             #If the graph is divisible, divide it and apply the algorithm to the subgraphs.
-            # g=self.G.subgraph([0,1])
-            # print(g.nodes[0])
-            # print(self.G.nodes[1])
-            # nodes_positive=self.G.nodes[clf.leading_eigenvector>=0]
-            # nodes_negative=self.G.nodes[clf.leading_eigenvector<0]
-            # import ipdb; ipdb.set_trace()
+        
             nodes=np.arange(len(clf.leading_eigenvector))
             nodes_positive=nodes[clf.leading_eigenvector>=0]
             nodes_negative=nodes[clf.leading_eigenvector<0]
-            # import ipdb; ipdb.set_trace()
-
             subgraph_positive=self.G.subgraph(nodes_positive)
             subgraph_negative=self.G.subgraph(nodes_negative)
             B_positive=self.Beq(nodes_positive)
