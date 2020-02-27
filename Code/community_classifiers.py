@@ -40,7 +40,7 @@ class TwoCommunityClassifier():
 
         #Alternatively, use built in function for eigenvalues
         vals,vecs=eig(self.B)
-        self.leading_eigenvector=vecs[:,np.argmax(vals)]
+        self.leading_eigenvector=np.ravel(vecs[:,np.argmax(vals)])
         if np.max(self.leading_eigenvector)*np.min(self.leading_eigenvector)>=0: #All elements of the same sign
             self.done=True
         s=[1 if v>=0 else -1 for v in self.leading_eigenvector]
@@ -55,11 +55,12 @@ class TwoCommunityClassifier():
 class NCommunityClassifier(TwoCommunityClassifier):
     def __init__(self,graph,B=None):
         super().__init__(graph,B)
-        self.Q=Tree()
+        # self.Q=Tree()
     
     def Beq(self,nodes):
         #compute the equivalent matrix Beq
-        nodes_selected=self.G.nodes==nodes
+        # nodes_selected=self.G.nodes==nodes
+        nodes_selected=nodes
         Beq=self.B[nodes_selected,nodes_selected]
         Beq-=np.diagonal(np.sum(Beq,axis=1))
         return Beq
@@ -67,7 +68,7 @@ class NCommunityClassifier(TwoCommunityClassifier):
     def fit(self,graph=None,B=None):
         
         if graph is None:
-            clf=TwoCommunityClassifier(self.graph,self.B)
+            clf=TwoCommunityClassifier(self.G,self.B)
         else:
             clf=TwoCommunityClassifier(graph,B)
         clf.fit()
@@ -78,8 +79,17 @@ class NCommunityClassifier(TwoCommunityClassifier):
                 self.category[node].append(1 if clf.leading_eigenvector[i]>=0 else -1)
         else:
             #If the graph is divisible, divide it and apply the algorithm to the subgraphs.
-            nodes_positive=self.G.nodes[clf.leading_eigenvector>=0]
-            nodes_negative=self.G.nodes[clf.leading_eigenvector<0]
+            # g=self.G.subgraph([0,1])
+            # print(g.nodes[0])
+            # print(self.G.nodes[1])
+            # nodes_positive=self.G.nodes[clf.leading_eigenvector>=0]
+            # nodes_negative=self.G.nodes[clf.leading_eigenvector<0]
+            # import ipdb; ipdb.set_trace()
+            nodes=np.arange(len(clf.leading_eigenvector))
+            nodes_positive=nodes[clf.leading_eigenvector>=0]
+            nodes_negative=nodes[clf.leading_eigenvector<0]
+            # import ipdb; ipdb.set_trace()
+
             subgraph_positive=self.G.subgraph(nodes_positive)
             subgraph_negative=self.G.subgraph(nodes_negative)
             B_positive=self.Beq(nodes_positive)
@@ -101,4 +111,5 @@ print("Communauté")
 print(clf.category)
 print("Q: %f"%(clf.Q))
 
-# clfN=NCommunityClassifier(G)    
+clfN=NCommunityClassifier(G)  
+clfN.fit()  
