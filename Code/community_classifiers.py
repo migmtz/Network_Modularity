@@ -76,8 +76,8 @@ class NCommunityClassifier(TwoCommunityClassifier):
             graph=self.G
         if category:
             self.category=category
-
-        clf=TwoCommunityClassifier(graph,B)
+        
+        clf=TwoCommunityClassifier(graph,B,self.category)
         clf.fit()
         # Push value of Q at the current node in the tree
         if clf.done:
@@ -99,6 +99,7 @@ class NCommunityClassifier(TwoCommunityClassifier):
             
             self.fit(subgraph_positive,B_positive,category)
             self.fit(subgraph_negative,B_negative,category)
+
             # Push the DQ values where relevant
 
 
