@@ -90,11 +90,12 @@ class NCommunityClassifier(TwoCommunityClassifier):
             graph=self.G
         if category:
             self.category=category
-        
+        # The first step is to attempt a split on the considered graph.
         clf=TwoCommunityClassifier(graph,B,self.m)
         clf.fit()
+
         if clf.done or self.level==0:
-            # If undivisible graph, do not return any classification and terminate the fitting operation 
+            # If it is an undivisible graph, do not return any classification and terminate the fitting operation 
             return None
         else:
             # Otherwise, assign each node of the considered graph to its category
@@ -109,10 +110,8 @@ class NCommunityClassifier(TwoCommunityClassifier):
             nodes=np.arange(len(clf.leading_eigenvector))
             nodes_positive=nodes[clf.leading_eigenvector>=0]
             nodes_negative=nodes[clf.leading_eigenvector<0]
-            
             subgraph_positive=graph.subgraph(nodes_positive)
             subgraph_negative=graph.subgraph(nodes_negative)
-
             B_positive=self.Beq(nodes_positive)
             B_negative=self.Beq(nodes_negative)
             self.fit(subgraph_positive,B_positive,category)
