@@ -158,4 +158,41 @@ def plot_Q(graph,eps=1e-3,maxQ=False):
         return q2
 
 plot_Q(G)
+
+# ----------------------------- Plot communities ----------------------------- #
+
+def plot_communities(G,clf):
+    # Labelize lists
+    dict_aux = {}
+    dict_labels = {}
+    i = -1
+    for key,val in clf.category.items():
+        if dict_aux.get(tuple(val)) is None:
+            i += 1
+        a = dict_aux.setdefault(tuple(val),i)
+        dict_labels.setdefault(key,a)
+
+    # Plot parameters
+    pos = networkx.kamada_kawai_layout(G)
+    rainbow = cm.rainbow(np.linspace(0,1,len(dict_aux)))
+    
+    plt.figure()
+    for k in range(len(dict_aux)):
+        nodes = [i for i in dict_labels.keys() if dict_labels[i] == k]
+        networkx.draw_networkx_nodes(G,pos,
+                                nodelist = nodes,
+                                node_color =rainbow[k].reshape(1,4),
+                                node_size=200,
+                                node_shape = 'o',
+                                label = str(k),
+                                alpha=0.8)
+
+    
+    networkx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
+    
+    plt.legend()
+    plt.show()
+
+plot_communities(G,clf)
+plot_communities(G,clfN)
         
