@@ -9,9 +9,9 @@ from matplotlib.pyplot import cm
 # --------------------------- Generate sample graph -------------------------- #
 
 G=networkx.generators.karate_club_graph()
-# G = networkx.read_gml('./data/polbooks.gml')
+G = networkx.read_gml('./data/polbooks.gml')
 
-
+# import ipdb; ipdb.set_trace()
 print("Matrice d'adjacence")
 print(to_numpy_matrix(G))
 print("Vecteurs des degres")
@@ -77,11 +77,12 @@ class NCommunityClassifier(TwoCommunityClassifier):
         super().__init__(graph,B)
         self.level=level
         self.Q=0
-        self.N=0
+        self.N=1
     
     def Beq(self,nodes):
         #compute the equivalent matrix Beq
         Beq=self.B[nodes,:][:,nodes]
+        # import ipdb; ipdb.set_trace()
         Beq-=np.diagonal(np.sum(Beq,axis=1))
         return Beq
 
@@ -102,17 +103,20 @@ class NCommunityClassifier(TwoCommunityClassifier):
             if self.level:
                 self.level-=1
             self.Q+=clf.Q
-            self.N+=2  
+            self.N+=1 
             for i,node in enumerate(graph.nodes):
                 self.category[node].append(1 if clf.leading_eigenvector[i]>=0 else -1)
             #Iterate the division on the two subgraphs
-            nodes=np.arange(len(clf.leading_eigenvector))
+            nodes=np.array(graph.nodes)
+            index=np.arange(0,len(nodes))
             nodes_positive=nodes[clf.leading_eigenvector>=0]
             nodes_negative=nodes[clf.leading_eigenvector<0]
+            index_positive=index[clf.leading_eigenvector>=0]
+            index_negative=index[clf.leading_eigenvector<0]
             subgraph_positive=graph.subgraph(nodes_positive)
             subgraph_negative=graph.subgraph(nodes_negative)
-            B_positive=self.Beq(nodes_positive)
-            B_negative=self.Beq(nodes_negative)
+            B_positive=self.Beq(index_positive)
+            B_negative=self.Beq(index_negative)
             self.fit(subgraph_positive,B_positive,category)
             self.fit(subgraph_negative,B_negative,category)
 
@@ -131,7 +135,7 @@ clfN.fit()
 print("N-communities modularity:%f"%(clfN.Q))
 print("Number of communities found:%d"%(clfN.N))
 
-
+# import ipdb; ipdb.set_trace()
 # --------------------------- Modularity evolution --------------------------- #
 
 def plot_Q(graph,eps=1e-3,maxQ=False):
@@ -156,7 +160,7 @@ def plot_Q(graph,eps=1e-3,maxQ=False):
     if maxQ:
         return q2
 
-plot_Q(G)
+# plot_Q(G)
 
 # ----------------------------- Plot communities ----------------------------- #
 
@@ -171,7 +175,7 @@ def plot_communities(G,clf):
             i += 1
         a = dict_aux.setdefault(tuple(val),i)
         dict_labels.setdefault(key,a)
-
+    print(dict_aux)
     # Plot parameters
     pos = networkx.kamada_kawai_layout(G)
     rainbow = cm.rainbow(np.linspace(0,1,len(dict_aux)))
