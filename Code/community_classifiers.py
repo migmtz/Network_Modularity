@@ -9,10 +9,12 @@ from matplotlib.pyplot import cm
 # --------------------------- Generate sample graph -------------------------- #
 
 G=networkx.generators.karate_club_graph()
+# G = networkx.read_gml('./data/polbooks.gml')
+
 
 print("Matrice d'adjacence")
 print(to_numpy_matrix(G))
-print("Vecteurs des degrés")
+print("Vecteurs des degres")
 print(np.sum(to_numpy_matrix(G),axis=1))
 
 # --------------- Create tree object to store modularity values -------------- #
@@ -45,11 +47,11 @@ class TwoCommunityClassifier():
         self.A=to_numpy_matrix(graph)
         self.k=np.sum(self.A,axis=1)
         if m is None:
-            self.m=np.sum(self.k)
+            self.m=np.sum(self.k)/2
         else:
             self.m=m
         if B is None:
-            self.B=self.A-np.dot(self.k,self.k.transpose())/self.m
+            self.B=self.A-np.dot(self.k,self.k.transpose())/(2*self.m)
         else:
             self.B=B
         self.leading_eigenvector=None
@@ -73,8 +75,6 @@ class TwoCommunityClassifier():
 class NCommunityClassifier(TwoCommunityClassifier):
     def __init__(self,graph,B=None,category=None,level=None):
         super().__init__(graph,B)
-        if category:
-            self.category=category
         self.level=level
         self.Q=0
         self.N=0
@@ -94,7 +94,6 @@ class NCommunityClassifier(TwoCommunityClassifier):
         # The first step is to attempt a split on the considered graph.
         clf=TwoCommunityClassifier(graph,B,self.m)
         clf.fit()
-
         if clf.done or self.level==0:
             # If it is an undivisible graph, do not return any classification and terminate the fitting operation 
             return None
@@ -106,7 +105,6 @@ class NCommunityClassifier(TwoCommunityClassifier):
             self.N+=2  
             for i,node in enumerate(graph.nodes):
                 self.category[node].append(1 if clf.leading_eigenvector[i]>=0 else -1)
-            
             #Iterate the division on the two subgraphs
             nodes=np.arange(len(clf.leading_eigenvector))
             nodes_positive=nodes[clf.leading_eigenvector>=0]
@@ -128,11 +126,11 @@ clf.fit()
 print("Two communities modularity: %f"%(clf.Q))
 
 
-
 clfN=NCommunityClassifier(G)  
 clfN.fit()  
 print("N-communities modularity:%f"%(clfN.Q))
 print("Number of communities found:%d"%(clfN.N))
+
 
 # --------------------------- Modularity evolution --------------------------- #
 
@@ -158,11 +156,11 @@ def plot_Q(graph,eps=1e-3,maxQ=False):
     if maxQ:
         return q2
 
-# plot_Q(G)
+plot_Q(G)
 
 # ----------------------------- Plot communities ----------------------------- #
 
-import cm
+# import cm
 def plot_communities(G,clf):
     # Labelize lists
     dict_aux = {}
@@ -269,4 +267,4 @@ def plot_communities_eigen(G,clf): # For now only with two communities
     plt.legend()
     plt.show()
 
-plot_communities_eigen(G,clf)
+# plot_communities_eigen(G,clf)
