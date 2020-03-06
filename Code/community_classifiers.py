@@ -4,6 +4,7 @@ import numpy as np
 from numpy.linalg import eig
 import matplotlib.pyplot as plt
 from scipy.sparse import csc_matrix
+import cm
 
 # --------------------------- Generate sample graph -------------------------- #
 
@@ -157,10 +158,11 @@ def plot_Q(graph,eps=1e-3,maxQ=False):
     if maxQ:
         return q2
 
-plot_Q(G)
+# plot_Q(G)
 
 # ----------------------------- Plot communities ----------------------------- #
 
+import cm
 def plot_communities(G,clf):
     # Labelize lists
     dict_aux = {}
