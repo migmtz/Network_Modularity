@@ -130,7 +130,7 @@ clf.fit()
 print("Two communities modularity: %f"%(clf.Q))
 
 
-clfN=NCommunityClassifier(G)  
+clfN=NCommunityClassifier(G,level=3)  
 clfN.fit()  
 print("N-communities modularity:%f"%(clfN.Q))
 print("Number of communities found:%d"%(clfN.N))
