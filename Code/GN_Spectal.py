@@ -21,7 +21,6 @@ class GN2communityClassifier():
 
     def fit(self):
       partitions=next(self.communities_generator)
-      self.category
       B=self.A-np.diag(self.k)
       s=np.array([1 if i in partitions[0] else -1 for i in range(self.G.number_of_nodes())])
       self.Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
@@ -46,8 +45,7 @@ class SPC2communityClassifier():
 
     def fit(self):
       sc = SpectralClustering(2, affinity='precomputed')
-      sc.fit(adj_mat)
-      self.category
+      sc.fit(self.A)
       B=self.A-np.diag(self.k)
       s=np.array([1 if i==1 else -1 for i in sc.labels_])
       self.Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
