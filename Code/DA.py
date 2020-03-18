@@ -5,8 +5,12 @@ from numpy.linalg import eig
 import matplotlib.pyplot as plt
 from scipy.sparse import csc_matrix
 from matplotlib.pyplot import cm
+import random
+
+np.random.seed(0)
 # from community_classifiers import plot_communities
 G=networkx.generators.karate_club_graph()
+
 
 class DA2communityClassifier():
     def __init__(self,graph):
@@ -16,16 +20,19 @@ class DA2communityClassifier():
         self.m=np.sum(self.k)/2
         self.Q=0
         self.category={node:[] for node in graph.nodes}
-
+        self.Q_history=[self.Q]
     
     def argmin(self,d):
+        """
+        Returns the key corresponding to the minimal value in a dictionnary
+        """
         if not d: 
             return None
         # import ipdb; ipdb.set_trace()
         min_val = min(d.values())
         return [k for k in d if d[k] == min_val][0]
 
-    def fit(self,eps=1e-5,maxiter=1000):
+    def fit(self,eps=1e-5,maxiter=1000,node_shift=3):
         Q=self.Q+2*eps
         self.count=0
         nodes=np.array(self.G.nodes)
@@ -47,32 +54,31 @@ class DA2communityClassifier():
                 else:
                     k_com=graph_negative.degree[node] 
                 self.fitness[node]=2*k_com/k-1
-                # Move the node with lowest fitness to the opposite community
-                # if np.random.binomial(1,1/len(index_nodes),1)==1:
-                #     # epsilon greedy strategy
-                #     node_min=np.random.randint(0,len(index_nodes),1)[0]
-                # else:
-                node_min=self.argmin(self.fitness)
-                arg_node_min=list(index_nodes).index(node_min)
-                print(arg_node_min)
-                if category[node_min]==1:
-                    index_nodes_positive.remove(arg_node_min)
-                    index_nodes_negative.append(arg_node_min)
-                    category[node_min]=-1
-                else:
-                    index_nodes_negative.remove(arg_node_min)
-                    index_nodes_positive.append(arg_node_min)
-                    category[node_min]=1
+                # Move the node_shift nodes with lowest fitness to the opposite community
+                candidates=self.fitness.copy()
+                for j in range(node_shift):
+                    node_min=self.argmin(candidates)
+                    index_node_min=list(nodes).index(node_min)
+                    # print(index_node_min)
+                    if category[node_min]==1:
+                        index_nodes_positive.remove(index_node_min)
+                        index_nodes_negative.append(index_node_min)
+                        category[node_min]=-1
+                    else:
+                        index_nodes_negative.remove(index_node_min)
+                        index_nodes_positive.append(index_node_min)
+                        category[node_min]=1
+                    del candidates[node_min]
                 # Recompute the subgraphs parameters
                 graph_positive=self.G.subgraph(nodes[index_nodes_positive])
                 graph_negative=self.G.subgraph(nodes[index_nodes_negative])
             #Compute Q
             self.Q=Q
-            B=self.A-np.dot(self.k,self.k.transpose())/(2*self.m)
+            B=self.A-self.k.dot(self.k.T)/(2*self.m)
             s=np.array([1 if i in index_nodes_positive else -1 for i in range(len(self.G.nodes))])
             Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
+            self.Q_history.append(Q)
             self.count+=1
-            import ipdb; ipdb.set_trace()
             if abs(Q-self.Q)<eps or self.count>maxiter:
                 break
         #Append final result
@@ -119,4 +125,4 @@ clf.fit()
 print("Q-value %f"%(clf.Q))
 print("categories %s"%(str(clf.category)))
 print("count %d"%(clf.count))
-plot_communities(G,clf)
+# plot_communities(G,clf)
