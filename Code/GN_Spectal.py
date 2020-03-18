@@ -4,7 +4,7 @@ import numpy as np
 from networkx.convert_matrix import to_numpy_matrix
 from networkx.algorithms import community
 from sklearn.cluster import SpectralClustering
-from community_classifiers import plot_communities
+# from community_classifiers import plot_communities
 
 G=nx.generators.karate_club_graph()
 
@@ -50,12 +50,8 @@ class SPC2communityClassifier():
     def fit(self):
       sc = SpectralClustering(2, affinity='precomputed')
       sc.fit(self.A)
-<<<<<<< HEAD
-      B=self.A-np.dot(self.k,self.k.transpose())/(2*self.m)
-=======
       kk=(self.k.dot(self.k.T))/(2*self.m)
       B=self.A-kk
->>>>>>> ea0dc3e94689ffd33cacb6e3a7639c167ab7f355
       s=np.array([1 if i==1 else -1 for i in sc.labels_])
       self.Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
       self.category=dict(zip(list(self.G.nodes), [[i] for i in s]))
@@ -66,4 +62,4 @@ clf_spc.fit()
 print("Q-value for spectral clustering %f"%(clf_spc.Q))
 print("categories spectral clustering %s"%(str(clf_spc.category)))
 
-plot_communities(G,clf_spc)
+# plot_communities(G,clf_spc)
