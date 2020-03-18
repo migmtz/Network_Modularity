@@ -130,7 +130,7 @@ clf.fit()
 print("Two communities modularity: %f"%(clf.Q))
 
 
-clfN=NCommunityClassifier(G,level=3)  
+clfN=NCommunityClassifier(G,level=None)  
 clfN.fit()  
 print("N-communities modularity:%f"%(clfN.Q))
 print("Number of communities found:%d"%(clfN.N))
@@ -160,7 +160,7 @@ def plot_Q(graph,eps=1e-3,maxQ=False):
     if maxQ:
         return q2
 
-# plot_Q(G)
+plot_Q(G)
 
 # ----------------------------- Plot communities ----------------------------- #
 
