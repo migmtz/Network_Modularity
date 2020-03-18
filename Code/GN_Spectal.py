@@ -19,13 +19,16 @@ class GN2communityClassifier():
         self.communities_generator = community.girvan_newman(graph)
         self.Q=0
         self.category={node:[] for node in graph.nodes}
+        self.q_b=0
 
     def fit(self):
       partitions=next(self.communities_generator)
-      B=self.A-np.dot(self.k,self.k.transpose())/(2*self.m)
-      s=np.array([1 if i in partitions[0] else -1 for i in range(self.G.number_of_nodes())])
+      kk=(self.k.dot(self.k.T))/(2*self.m)
+      B=self.A-kk
+      s=np.array([1 if i in partitions[1] else -1 for i in range(self.G.number_of_nodes())])
       self.Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
       self.category=dict(zip(list(self.G.nodes), [[i] for i in s]))
+      self.q_b=community.modularity(self.G,partitions)# this is the buit-in function for computing modularity, I add it to check if my calculations are correct
 
 
 clf_GN=GN2communityClassifier(G)
@@ -47,7 +50,12 @@ class SPC2communityClassifier():
     def fit(self):
       sc = SpectralClustering(2, affinity='precomputed')
       sc.fit(self.A)
+<<<<<<< HEAD
       B=self.A-np.dot(self.k,self.k.transpose())/(2*self.m)
+=======
+      kk=(self.k.dot(self.k.T))/(2*self.m)
+      B=self.A-kk
+>>>>>>> ea0dc3e94689ffd33cacb6e3a7639c167ab7f355
       s=np.array([1 if i==1 else -1 for i in sc.labels_])
       self.Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
       self.category=dict(zip(list(self.G.nodes), [[i] for i in s]))
