@@ -2,12 +2,13 @@
 import networkx as nx
 import numpy as np
 from networkx.convert_matrix import to_numpy_matrix
+from networkx.algorithms import community
 from sklearn.cluster import SpectralClustering
 from collections import defaultdict
 
 G=nx.generators.karate_club_graph()
 
-#spectral clustering two community
+#spectral clustering for 2 or more communities
 class SPCcommunityClassifier():
     def __init__(self,graph,nb_community=2):
         self.G=graph
