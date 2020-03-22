@@ -6,7 +6,7 @@ from networkx.algorithms import community
 G=nx.generators.karate_club_graph()
 
 
-#GN method two cmmunity
+#GN Algorithm for 2 or more cmmunities
 class GNcommunityClassifier():
     def __init__(self,graph,nb_community=2):
         self.G=graph
