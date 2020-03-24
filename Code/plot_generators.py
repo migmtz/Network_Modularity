@@ -16,14 +16,14 @@ def plot_Q(graph,NCommunityClassifier,eps=1e-3,maxQ=False):
     Q_results=[0]
     i=1
     while q2-q1>eps:
-       clfN=NCommunityClassifier(graph,level=i)
+       clfN=NCommunityClassifier(graph,Nmax=i)
        clfN.fit()
        q1=q2
        q2=clfN.Q 
        Q_results.append(q2)
        i+=1
-    plt.plot(np.arange(0,i),Q_results)
-    plt.xlabel("Division level")
+    plt.plot(np.arange(1,i+1),Q_results)
+    plt.xlabel("Number of communities")
     plt.ylabel("Modularity")
     plt.show()
     if maxQ:

@@ -75,9 +75,9 @@ class TwoCommunityClassifier():
 
 class NCommunityClassifier(TwoCommunityClassifier):
 
-    def __init__(self,graph,B=None,category=None,level=None):
+    def __init__(self,graph,B=None,category=None,Nmax=None):
         super().__init__(graph,B)
-        self.level=level
+        self.Nmax=Nmax
         self.Q=0
         self.N=1
     
@@ -97,13 +97,13 @@ class NCommunityClassifier(TwoCommunityClassifier):
         # The first step is to attempt a split on the considered graph.
         clf=TwoCommunityClassifier(graph,B,self.m)
         clf.fit()
-        if clf.done or self.level==0:
+        if clf.done or self.Nmax==0:
             # If it is an undivisible graph, do not return any classification and terminate the fitting operation 
             return None
         else:
             # Otherwise, assign each node of the considered graph to its category
-            if self.level:
-                self.level-=1
+            if self.Nmax:
+                self.Nmax-=1
             self.Q+=clf.Q
             self.N+=1 
             for i,node in enumerate(graph.nodes):
@@ -132,7 +132,7 @@ clf.fit()
 print("Two communities modularity: %f"%(clf.Q))
 
 
-clfN=NCommunityClassifier(G,level=None)  
+clfN=NCommunityClassifier(G,Nmax=None)  
 clfN.fit()  
 print("N-communities modularity:%f"%(clfN.Q))
 print("Number of communities found:%d"%(clfN.N))

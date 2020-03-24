@@ -13,14 +13,22 @@ np.random.seed(0)
 G = networkx.read_gml('./data/polbooks.gml')
 
 class DA2communityClassifier():
-    def __init__(self,graph):
+    def __init__(self,graph,B=None,m=None):
         self.G=graph
         self.A=to_numpy_matrix(graph)
         self.k=np.sum(self.A,axis=1)
-        self.m=np.sum(self.k)/2
         self.Q=0
         self.category={node:[] for node in graph.nodes}
         self.Q_history=[self.Q]
+        if m is not None:
+            self.m=m
+        else:
+            self.m=np.sum(self.k)/2
+        if B is not None:
+            self.B=B
+        else:
+            self.B=self.A-self.k.dot(self.k.T)/(2*self.m)
+        self.done=False
     
     def argmin(self,d):
         """
@@ -74,31 +82,32 @@ class DA2communityClassifier():
                 graph_negative=self.G.subgraph(nodes[index_nodes_negative])
             #Compute Q
             self.Q=Q
-            B=self.A-self.k.dot(self.k.T)/(2*self.m)
             s=np.array([1 if i in index_nodes_positive else -1 for i in range(len(self.G.nodes))])
-            Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
+            Q=np.einsum("i,ij,j",s,self.B,s)/(4*self.m)
             self.Q_history.append(Q)
             self.count+=1
             if self.count%10==0:
                 print("iteration %d"%(self.count))
             if abs(Q-self.Q)<eps or self.count>maxiter:
-                break
+                if self.Q<=0:
+                    self.done=True
+                break            
         #Append final result
         for node in self.G.nodes:
             self.category[node].append(category[node])
 
 # Multiclass classifier to test
-class NCommunityClassifier(TwoCommunityClassifier):
-    def __init__(self,graph,B=None,category=None,level=None):
+class DANcommunityClassifier(DA2communityClassifier):
+
+    def __init__(self,graph,B=None,category=None,Nmax=None):
         super().__init__(graph,B)
-        self.level=level
+        self.Nmax=Nmax
         self.Q=0
         self.N=1
     
     def Beq(self,nodes):
         #compute the equivalent matrix Beq
         Beq=self.B[nodes,:][:,nodes]
-        # import ipdb; ipdb.set_trace()
         Beq-=np.diagonal(np.sum(Beq,axis=1))
         return Beq
 
@@ -109,26 +118,33 @@ class NCommunityClassifier(TwoCommunityClassifier):
         if category:
             self.category=category
         # The first step is to attempt a split on the considered graph.
-        clf=TwoCommunityClassifier(graph,B,self.m)
+        clf=DA2communityClassifier(graph,B,self.m)
         clf.fit()
-        if clf.done or self.level==0:
+        if clf.done or self.Nmax==0:
             # If it is an undivisible graph, do not return any classification and terminate the fitting operation 
             return None
         else:
             # Otherwise, assign each node of the considered graph to its category
-            if self.level:
-                self.level-=1
+            if self.Nmax:
+                self.Nmax-=1
             self.Q+=clf.Q
             self.N+=1 
+            index_positive=[]
+            index_negative=[]
+            nodes_positive=[]
+            nodes_negative=[]
             for i,node in enumerate(graph.nodes):
-                self.category[node].append(1 if clf.leading_eigenvector[i]>=0 else -1)
+                if clf.category[node]==[1]:
+                    self.category[node].append(1)
+                    index_positive.append(i)
+                    nodes_positive.append(node)
+                else:
+                    self.category[node].append(-1)
+                    index_negative.append(i)
+                    nodes_negative.append(node)
             #Iterate the division on the two subgraphs
             nodes=np.array(graph.nodes)
             index=np.arange(0,len(nodes))
-            nodes_positive=nodes[clf.leading_eigenvector>=0]
-            nodes_negative=nodes[clf.leading_eigenvector<0]
-            index_positive=index[clf.leading_eigenvector>=0]
-            index_negative=index[clf.leading_eigenvector<0]
             subgraph_positive=graph.subgraph(nodes_positive)
             subgraph_negative=graph.subgraph(nodes_negative)
             B_positive=self.Beq(index_positive)
@@ -138,11 +154,15 @@ class NCommunityClassifier(TwoCommunityClassifier):
 
 
 
+# clf=DA2communityClassifier(G)
+# clf.fit()
+# print("Q-value %f"%(clf.Q))
+# print("categories %s"%(str(clf.category)))
+# print("count %d"%(clf.count))
 
 
-clf=DA2communityClassifier(G)
-clf.fit()
-print("Q-value %f"%(clf.Q))
-print("categories %s"%(str(clf.category)))
-print("count %d"%(clf.count))
-plot_communities(G,clf)
+clfN=DANcommunityClassifier(G,Nmax=10)
+clfN.fit()
+print("Q-value %f"%(clfN.Q))
+print("categories %s"%(str(clfN.category)))
+plot_communities(G,clfN)
