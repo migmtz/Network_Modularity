@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csc_matrix
 from matplotlib.pyplot import cm
 import random
-
+from plot_generators import *
 np.random.seed(0)
 # from community_classifiers import plot_communities
-G=networkx.generators.karate_club_graph()
-
+# G=networkx.generators.karate_club_graph()
+G = networkx.read_gml('./data/polbooks.gml')
 
 class DA2communityClassifier():
     def __init__(self,graph):
@@ -32,7 +32,7 @@ class DA2communityClassifier():
         min_val = min(d.values())
         return [k for k in d if d[k] == min_val][0]
 
-    def fit(self,eps=1e-5,maxiter=1000,node_shift=3):
+    def fit(self,eps=1e-5,maxiter=100,node_shift=3):
         Q=self.Q+2*eps
         self.count=0
         nodes=np.array(self.G.nodes)
@@ -53,6 +53,7 @@ class DA2communityClassifier():
                     k_com=graph_positive.degree[node] # degree of the node within the community
                 else:
                     k_com=graph_negative.degree[node] 
+                # if k>5:
                 self.fitness[node]=2*k_com/k-1
                 # Move the node_shift nodes with lowest fitness to the opposite community
                 candidates=self.fitness.copy()
@@ -79,44 +80,13 @@ class DA2communityClassifier():
             Q=np.einsum("i,ij,j",s,B,s)/(4*self.m)
             self.Q_history.append(Q)
             self.count+=1
+            if self.count%10==0:
+                print("iteration %d"%(self.count))
             if abs(Q-self.Q)<eps or self.count>maxiter:
                 break
         #Append final result
         for node in self.G.nodes:
             self.category[node].append(category[node])
-
-def plot_communities(G,clf):
-    # Labelize lists
-    dict_aux = {}
-    dict_labels = {}
-    i = -1
-    for key,val in clf.category.items():
-        if dict_aux.get(tuple(val)) is None:
-            i += 1
-        a = dict_aux.setdefault(tuple(val),i)
-        dict_labels.setdefault(key,a)
-    print(dict_aux)
-    # Plot parameters
-    pos = networkx.kamada_kawai_layout(G)
-    rainbow = cm.rainbow(np.linspace(0,1,len(dict_aux)))
-    
-    plt.figure()
-    for k in range(len(dict_aux)):
-        nodes = [i for i in dict_labels.keys() if dict_labels[i] == k]
-        networkx.draw_networkx_nodes(G,pos,
-                                nodelist = nodes,
-                                node_color =rainbow[k].reshape(1,4),
-                                node_size=200,
-                                node_shape = 'o',
-                                label = str(k),
-                                alpha=0.8)
-
-    
-    networkx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
-    
-    plt.legend()
-    plt.show()
-
 
 # Multiclass classifier to test
 
@@ -125,4 +95,4 @@ clf.fit()
 print("Q-value %f"%(clf.Q))
 print("categories %s"%(str(clf.category)))
 print("count %d"%(clf.count))
-# plot_communities(G,clf)
+plot_communities(G,clf)
