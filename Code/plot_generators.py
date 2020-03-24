@@ -7,7 +7,7 @@ from scipy.sparse import csc_matrix
 from matplotlib.pyplot import cm
 # --------------------------- Modularity evolution --------------------------- #
 
-def plot_Q(graph,eps=1e-3,maxQ=False):
+def plot_Q(graph,NCommunityClassifier,eps=1e-3,maxQ=False):
     """
         Build a classifier stopping at each level N, compute the corresponding modularity
     """

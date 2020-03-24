@@ -53,7 +53,6 @@ class DA2communityClassifier():
                     k_com=graph_positive.degree[node] # degree of the node within the community
                 else:
                     k_com=graph_negative.degree[node] 
-                # if k>5:
                 self.fitness[node]=2*k_com/k-1
                 # Move the node_shift nodes with lowest fitness to the opposite community
                 candidates=self.fitness.copy()
@@ -89,6 +88,57 @@ class DA2communityClassifier():
             self.category[node].append(category[node])
 
 # Multiclass classifier to test
+class NCommunityClassifier(TwoCommunityClassifier):
+    def __init__(self,graph,B=None,category=None,level=None):
+        super().__init__(graph,B)
+        self.level=level
+        self.Q=0
+        self.N=1
+    
+    def Beq(self,nodes):
+        #compute the equivalent matrix Beq
+        Beq=self.B[nodes,:][:,nodes]
+        # import ipdb; ipdb.set_trace()
+        Beq-=np.diagonal(np.sum(Beq,axis=1))
+        return Beq
+
+    def fit(self,graph=None,B=None,category=None):
+
+        if graph is None:
+            graph=self.G
+        if category:
+            self.category=category
+        # The first step is to attempt a split on the considered graph.
+        clf=TwoCommunityClassifier(graph,B,self.m)
+        clf.fit()
+        if clf.done or self.level==0:
+            # If it is an undivisible graph, do not return any classification and terminate the fitting operation 
+            return None
+        else:
+            # Otherwise, assign each node of the considered graph to its category
+            if self.level:
+                self.level-=1
+            self.Q+=clf.Q
+            self.N+=1 
+            for i,node in enumerate(graph.nodes):
+                self.category[node].append(1 if clf.leading_eigenvector[i]>=0 else -1)
+            #Iterate the division on the two subgraphs
+            nodes=np.array(graph.nodes)
+            index=np.arange(0,len(nodes))
+            nodes_positive=nodes[clf.leading_eigenvector>=0]
+            nodes_negative=nodes[clf.leading_eigenvector<0]
+            index_positive=index[clf.leading_eigenvector>=0]
+            index_negative=index[clf.leading_eigenvector<0]
+            subgraph_positive=graph.subgraph(nodes_positive)
+            subgraph_negative=graph.subgraph(nodes_negative)
+            B_positive=self.Beq(index_positive)
+            B_negative=self.Beq(index_negative)
+            self.fit(subgraph_positive,B_positive,category)
+            self.fit(subgraph_negative,B_negative,category)
+
+
+
+
 
 clf=DA2communityClassifier(G)
 clf.fit()
