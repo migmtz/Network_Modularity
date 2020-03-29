@@ -46,7 +46,7 @@ class DA2communityClassifier():
         min_val = min(d.values())
         return [k for k in d if d[k] == min_val][0]
 
-    def fit(self,eps=1e-5,maxiter=100,node_shift=3):
+    def fit(self,eps=1e-5,maxiter=100,node_shift=1):
         Q=self.Q+2*eps
         self.count=0
         nodes=np.array(self.G.nodes)
@@ -95,7 +95,8 @@ class DA2communityClassifier():
             #Compute Q
             self.Q=Q
             s=np.array([1 if i in index_nodes_positive else -1 for i in range(len(self.G.nodes))])
-            Q=np.einsum("i,ij,j",s,self.B,s)/(4*self.m)
+            # Q=np.einsum("i,ij,j",s,self.B,s)/(4*self.m)
+            Q=self.modularity(graph_positive,graph_negative)
             self.Q_history.append(Q)
             self.count+=1
             if self.count%10==0:
@@ -174,8 +175,8 @@ print("categories %s"%(str(clf.category)))
 print("count %d"%(clf.count))
 plot_communities(G,clf)
 
-# clfN=DANcommunityClassifier(G,Nmax=10)
-# clfN.fit()
-# print("Q-value %f"%(clfN.Q))
-# print("categories %s"%(str(clfN.category)))
-# plot_communities(G,clfN)
+clfN=DANcommunityClassifier(G,Nmax=10)
+clfN.fit()
+print("Q-value %f"%(clfN.Q))
+print("categories %s"%(str(clfN.category)))
+plot_communities(G,clfN)
