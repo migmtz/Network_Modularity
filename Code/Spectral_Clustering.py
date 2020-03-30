@@ -6,16 +6,20 @@ from networkx.algorithms import community
 from sklearn.cluster import SpectralClustering
 from collections import defaultdict
 
-G=nx.generators.karate_club_graph()
-
-#spectral clustering for 2 or more communities
-class SPCcommunityClassifier():
-    def __init__(self,graph,nb_community=2):
+class SP2CcommunityClassifier():
+    def __init__(self,graph):
         self.G=graph
         self.A=to_numpy_matrix(graph)
-        self.sc = SpectralClustering(nb_community, affinity='precomputed')
+        self.k=np.sum(self.A,axis=1)
+        self.m=np.sum(self.k)/2
+        self.B=self.A-np.dot(self.k,self.k.transpose())/(2*self.m)
+        self.sc = SpectralClustering(2, affinity='precomputed')
         self.Q=0
         self.category={node:[] for node in graph.nodes}
+        self.s=None
+        self.G_positive=None
+        self.G_negative=None
+        self.done=False
 
     def fit(self):
       self.sc.fit(self.A)
@@ -25,22 +29,15 @@ class SPCcommunityClassifier():
       for k, v in rows: 
         d[k].append(v)
       partitions=list(d.values())
-      self.Q=community.modularity(self.G,partitions)
-
       ll=[]
       for i in self.sc.labels_:
         label=[2*int(h)-1 for h in list(bin(i)[2:])]
         ll.append(label)
       self.category=dict(zip(list(self.G.nodes),ll))
-      
-
-
-clf_spc_2=SPCcommunityClassifier(G,nb_community=2)
-clf_spc_2.fit()
-print("Modularity spectral 2 community %f"%(clf_spc_2.Q))
-print("categories spectral 2 community %s"%(str(clf_spc_2.category)))
-
-clf_spc_3=SPCcommunityClassifier(G,nb_community=3)
-clf_spc_3.fit()
-print("Modularity spectral 3 community %f"%(clf_spc_3.Q))
-print("categories spectral 3 community %s"%(str(clf_spc_3.category)))
+      self.s=np.array([self.category[node][0] for node in self.G.nodes])
+      nodes=np.array(self.G.nodes)
+      self.G_positive=self.G.subgraph(nodes[self.s==1])
+      self.G_negative=self.G.subgraph(nodes[self.s==-1])
+      self.Q=np.einsum("i,ij,j",self.s,self.B,self.s)/(4*self.m)
+      if self.Q<0:
+        self.done=True
