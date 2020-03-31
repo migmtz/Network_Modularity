@@ -80,10 +80,18 @@ class NCommunitiesClassifier():
 
 # G = networkx.read_gml('./data/polbooks.gml') #105 nodes
 
-# clfN=NCommunitiesClassifier(G,GN2communityClassifier,)
+# clfN=NCommunitiesClassifier(G,GN2communityClassifier)
 # clfN.fit()
 # print(clfN.Q)
 # print(clfN.community_count)
-
 # print(clfN.Q_History)
 # print(clfN.padded_modularity_sequence(10))
+
+# clf2=GN2communityClassifier(G)
+# clf2.fit()
+# clf2=GN2communityClassifier(clf2.G_positive)
+# clf2.fit()
+# Beq=clf2.B-np.diag(np.sum(clf2.B,axis=1))
+# Q=np.einsum("i,ij,j",clf2.s,Beq,clf2.s)/(4*clf2.m)
+# print(Q)
+
