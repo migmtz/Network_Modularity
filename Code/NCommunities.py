@@ -8,9 +8,16 @@ from matplotlib.pyplot import cm
 from plot_generators import *
 from Newman06 import Newman2CommunityClassifier
 from DuchArenas import DA2communityClassifier
+from Girvan_Newman import GN2communityClassifier
+from Spectral_Clustering import SP2CcommunityClassifier
 
-G = networkx.read_gml('./data/polbooks.gml')
-# G=networkx.generators.karate_club_graph()
+# G = networkx.read_gml('./data/netscience.gml') #1589 nodes
+G = networkx.read_gml('./data/polbooks.gml') #105 nodes
+# G=networkx.davis_southern_women_graph() #32 nodes
+# G=networkx.florentine_families_graph() #15 nodes
+
+# import ipdb; ipdb.set_trace()
+# print(len(G))
 
 class NCommunitiesClassifier():
 
@@ -68,4 +75,19 @@ class NCommunitiesClassifier():
             self.Q=0
             self.Q_History.append(self.Q)
 
+# clfN=NCommunitiesClassifier(G,DA2communityClassifier)
+# clfN.fit()
+# print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))
 
+# clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier)
+# clfN.fit()
+# print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))
+
+
+# clfN=NCommunitiesClassifier(G,GN2communityClassifier)
+# clfN.fit()
+# print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))
+
+# clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier)
+# clfN.fit()
+# print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))

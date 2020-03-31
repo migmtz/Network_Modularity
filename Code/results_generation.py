@@ -39,19 +39,19 @@ G=networkx.read_gml('./data/polbooks.gml') #find a larger network (does not exce
 n=6
 
 # ----------------------------- Plot construction ---------------------------- #
-
+import ipdb; ipdb.set_trace()
 clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier,n)
 clfN.fit()
-plt.plot(range(1,n+1),clfN.Q_History,label="N06")
+plt.plot(np.arange(1,n+1),clfN.Q_History,label="N06")
 clfN=NCommunitiesClassifier(G,DA2communityClassifier,n)
 clfN.fit()
-plt.plot(range(1,n+1),clfN.Q_History,label="DA")
-clfN=NCommunitiesClassifier(G,GN2communityClassifier,n)
-clfN.fit()
-plt.plot(range(1,n+1),clfN.Q_History,label="GN")
-clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier,n)
-clfN.fit()
-plt.plot(range(1,n+1),clfN.Q_History,label="Spectral")
+plt.plot(np.arange(1,n+1),clfN.Q_History,label="DA")
+# clfN=NCommunitiesClassifier(G,GN2communityClassifier,n)
+# clfN.fit()
+# plt.plot(np.arange(1,n+1),clfN.Q_History,label="GN")
+# clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier,n)
+# clfN.fit()
+# plt.plot(np.arange(1,n+1),clfN.Q_History,label="Spectral")
 plt.xlabel("Number of communities")
 plt.legend()
 plt.show()
