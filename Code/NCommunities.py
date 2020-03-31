@@ -57,7 +57,7 @@ class NCommunitiesClassifier():
                 G=self.G
             clf=self.BinaryClassifier(G)
             clf.fit()
-            DQ=self.compute_modularity(clf)
+            DQ=clf.Q #self.compute_modularity(clf)
             # import ipdb; ipdb.set_trace()
             if self.optimal_stop:
                 if DQ<0:
