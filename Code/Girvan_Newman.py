@@ -30,7 +30,6 @@ class GN2communityClassifier():
       for i in range(self.nb_iter):
         partitions=next(self.communities_generator)
       for i,l in enumerate(partitions):
-        #labels=np.full(len(l),i)
         labels=[[2*int(h)-1 for h in list(bin(i)[2:])]]*len(l)
         self.category.update(dict(zip(l,labels)))
       self.s=np.array([self.category[node][0] for node in self.G.nodes])
@@ -40,13 +39,3 @@ class GN2communityClassifier():
       self.Q=np.einsum("i,ij,j",self.s,self.B,self.s)/(4*self.m)
       if self.Q<0:
         self.done=True
-
-# clf_gn_2=GN2communityClassifier(G)
-# clf_gn_2.fit()
-# print("Modularity GN 2 community: %f"%(clf_gn_2.Q))
-# print("Categories GN 2 community:  %s"%(str(clf_gn_2.category)))# Attention! the dict is not sorted
-
-# # clf_gn_n=GNcommunityClassifier(G,nb_community=2)
-# # clf_gn_n.fit()
-# # print("Modularity GN %d community: %f"%(clf_gn_n.nb_iter+1,clf_gn_n.Q))
-# # print("Categories GN %d community:  %s"%(clf_gn_n.nb_iter+1,str(clf_gn_n.category)))

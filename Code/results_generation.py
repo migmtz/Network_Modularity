@@ -11,8 +11,11 @@ from DuchArenas import DA2communityClassifier
 from Girvan_Newman import GN2communityClassifier
 from Spectral_Clustering import SP2CcommunityClassifier
 from NCommunities import NCommunitiesClassifier
-
+import warnings
+warnings.filterwarnings("ignore")
 np.random.seed(1) 
+
+# import ipdb; ipdb.set_trace()
 
 # ---------------------------------------------------------------------------- #
 #                               Graph data import                              #
@@ -23,7 +26,7 @@ np.random.seed(1)
 G_List=[]
 G_List.append(networkx.generators.karate_club_graph())
 g_polbooks=networkx.read_gml('./data/polbooks.gml')
-g_polbooks.name="Books politics"
+g_polbooks.name="Books politics" #set names to graphs
 G_List.append(g_polbooks)
 
 
@@ -40,18 +43,23 @@ n=6
 
 # ----------------------------- Plot construction ---------------------------- #
 
+# import ipdb; ipdb.set_trace()
 clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier,n)
 clfN.fit()
-plt.plot(np.arange(1,n+1),clfN.Q_History,label="N06")
+# print(clfN.Q_History)
+plt.plot(np.arange(1,n+1),clfN.padded_modularity_sequence(n),label="N06")
 clfN=NCommunitiesClassifier(G,DA2communityClassifier,n)
 clfN.fit()
-plt.plot(np.arange(1,n+1),clfN.Q_History,label="DA")
-# clfN=NCommunitiesClassifier(G,GN2communityClassifier,n)
-# clfN.fit()
-# plt.plot(np.arange(1,n+1),clfN.Q_History,label="GN")
-# clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier,n)
-# clfN.fit()
-# plt.plot(np.arange(1,n+1),clfN.Q_History,label="Spectral")
+# print(clfN.Q_History)
+plt.plot(np.arange(1,n+1),clfN.padded_modularity_sequence(n),label="DA")
+clfN=NCommunitiesClassifier(G,GN2communityClassifier,n)
+clfN.fit()
+# print(clfN.Q_History)
+plt.plot(np.arange(1,n+1),clfN.padded_modularity_sequence(n),label="GN")
+clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier,n)
+clfN.fit()
+# print(clfN.Q_History)s
+plt.plot(np.arange(1,n+1),clfN.padded_modularity_sequence(n),label="Spectral")
 plt.xlabel("Number of communities")
 plt.legend()
 plt.show()
@@ -61,18 +69,18 @@ plt.show()
 # ---------------------------------------------------------------------------- #
 
 for g in G_List:
-    clfN=NCommunitiesClassifier(g,Newman2CommunityClassifier)
+    clfN=NCommunitiesClassifier(G,DA2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
-    clfN=NCommunitiesClassifier(g,DA2communityClassifier)
+    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
+    clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
-    clfN=NCommunitiesClassifier(g,GN2communityClassifier)
+    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
+    clfN=NCommunitiesClassifier(G,GN2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
-    clfN=NCommunitiesClassifier(g,SP2CcommunityClassifier)
+    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
+    clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
+    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
 
 
 # ---------------------------------------------------------------------------- #
