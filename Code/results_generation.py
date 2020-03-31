@@ -39,7 +39,7 @@ G=networkx.read_gml('./data/polbooks.gml') #find a larger network (does not exce
 n=6
 
 # ----------------------------- Plot construction ---------------------------- #
-import ipdb; ipdb.set_trace()
+
 clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier,n)
 clfN.fit()
 plt.plot(np.arange(1,n+1),clfN.Q_History,label="N06")
@@ -79,19 +79,18 @@ for g in G_List:
 #                                Plot of a graph                               #
 # ---------------------------------------------------------------------------- #
 
-# Plot a graph with a given number of communities
-
+# ------------------------------ Two communities ----------------------------- #
 
 G=networkx.generators.karate_club_graph()
-
-clf2=NCommunitiesClassifier(G,Newman2CommunityClassifier)
+clf2=Newman2CommunityClassifier(G)
 clf2.fit()
 plot_communities(G,clf2)
 plot_communities_eigen(G,clf2)
 
+# ------------------------------- N communities ------------------------------ #
 
 G=networkx.read_gml('./data/polbooks.gml')
 clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier)
 clfN.fit()
 plot_communities(G,clfN)
-plot_communities_eigen(G,clfN)
+# plot_communities_eigen(G,clfN)
