@@ -71,16 +71,16 @@ plt.show()
 for g in G_List:
     clfN=NCommunitiesClassifier(G,DA2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
+    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
     clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
+    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
     clfN=NCommunitiesClassifier(G,GN2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
+    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
     clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.community_count))
+    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
 
 
 # ---------------------------------------------------------------------------- #
