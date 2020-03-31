@@ -60,16 +60,38 @@ plt.show()
 #                           Table optimal modularity                           #
 # ---------------------------------------------------------------------------- #
 
-for G in G_List:
-    clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier)
+for g in G_List:
+    clfN=NCommunitiesClassifier(g,Newman2CommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))
-    clfN=NCommunitiesClassifier(G,DA2communityClassifier)
+    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
+    clfN=NCommunitiesClassifier(g,DA2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))
-    clfN=NCommunitiesClassifier(G,GN2communityClassifier)
+    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
+    clfN=NCommunitiesClassifier(g,GN2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))
-    clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier)
+    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
+    clfN=NCommunitiesClassifier(g,SP2CcommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(G.name,clfN.Q,clfN.commmunity_count))
+    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(g.name,clfN.Q,clfN.commmunity_count))
+
+
+# ---------------------------------------------------------------------------- #
+#                                Plot of a graph                               #
+# ---------------------------------------------------------------------------- #
+
+# Plot a graph with a given number of communities
+
+
+G=networkx.generators.karate_club_graph()
+
+clf2=NCommunitiesClassifier(G,Newman2CommunityClassifier)
+clf2.fit()
+plot_communities(G,clf2)
+plot_communities_eigen(G,clf2)
+
+
+G=networkx.read_gml('./data/polbooks.gml')
+clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier)
+clfN.fit()
+plot_communities(G,clfN)
+plot_communities_eigen(G,clfN)
