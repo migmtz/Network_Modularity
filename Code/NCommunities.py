@@ -12,7 +12,6 @@ from DuchArenas import DA2communityClassifier
 G = networkx.read_gml('./data/polbooks.gml')
 # G=networkx.generators.karate_club_graph()
 
-
 class NCommunitiesClassifier():
 
     def __init__(self,G,BinaryClassifier,N=None):
@@ -20,12 +19,14 @@ class NCommunitiesClassifier():
         self.m=np.sum(to_numpy_matrix(G))/2
         self.BinaryClassifier=BinaryClassifier
         self.commmunity_count=1
+        self.optimal_stop=False
+        self.N=N
         if N is None:
-            self.N=10
-        else:
-            self.N=N
+            self.optimal_stop=True #stop algorithm using the natural criterion.
         self.category={node:[] for node in G.nodes}
         self.Q=0
+        self.Q_History=[0]
+        self.optimal=(self.Q,self.commmunity_count)
         self.done=False
 
     def compute_modularity(self,G,s):
@@ -39,22 +40,32 @@ class NCommunitiesClassifier():
         Q=np.einsum("i,ij,j",s,B,s)/(4*m)
         return Q
 
-    def fit(self,G=None):
-        if G is None:
-            G=self.G
-        clf=self.BinaryClassifier(G)
-        clf.fit()
-        DQ=self.compute_modularity(G,clf.s)
-        if not self.done:
-        # if not self.done:
-            #interrupt calculation when there is no more progress to be done.
-            #also possible to steer computation with the required number of communities
-            for node in clf.category:
-                self.category[node]+=clf.category[node]
-            self.Q+=DQ
-            self.commmunity_count+=1
-            if self.N is not None and self.N==self.commmunity_count:
-                self.done=True
-            # import ipdb; ipdb.set_trace()
-            self.fit(clf.G_positive)
-            self.fit(clf.G_negative)
+    def fit(self,G=None,verbose=False):
+        try:
+            if G is None:
+                G=self.G
+            clf=self.BinaryClassifier(G)
+            clf.fit()
+            DQ=self.compute_modularity(G,clf.s)
+            if self.optimal_stop:
+                if DQ<0:
+                    self.done=True
+            if not self.done:
+                for node in clf.category:
+                    self.category[node]+=clf.category[node]
+                self.Q+=DQ
+                self.Q_History.append(self.Q)
+                self.commmunity_count+=1
+                if self.N is not None and self.N==self.commmunity_count:
+                    self.done=True
+                if self.Q>self.optimal[0]:
+                    self.optimal=(self.Q,self.commmunity_count)
+                self.fit(clf.G_positive)
+                self.fit(clf.G_negative)
+        except:
+            if verbose:
+                print("Error while running the NCommunities")  
+            self.Q=0
+            self.Q_History.append(self.Q)
+
+
