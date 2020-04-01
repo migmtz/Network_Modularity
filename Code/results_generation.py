@@ -68,19 +68,21 @@ plt.show()
 #                           Table optimal modularity                           #
 # ---------------------------------------------------------------------------- #
 
+#take the maximal over a sequence of n modularity
+
 for g in G_List:
-    clfN=NCommunitiesClassifier(g,DA2communityClassifier)
+    clfN=NCommunitiesClassifier(g,DA2communityClassifier,n)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
-    clfN=NCommunitiesClassifier(g,Newman2CommunityClassifier)
+    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(g.name,clfN.return_optimal()[0],clfN.return_optimal()[1]))
+    clfN=NCommunitiesClassifier(g,Newman2CommunityClassifier,n)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
-    clfN=NCommunitiesClassifier(g,GN2communityClassifier)
+    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(g.name,clfN.return_optimal()[0],clfN.return_optimal()[1]))
+    clfN=NCommunitiesClassifier(g,GN2communityClassifier,n)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
-    clfN=NCommunitiesClassifier(g,SP2CcommunityClassifier)
+    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(g.name,clfN.return_optimal()[0],clfN.return_optimal()[1]))
+    clfN=NCommunitiesClassifier(g,SP2CcommunityClassifier,n)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
+    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(g.name,clfN.return_optimal()[0],clfN.return_optimal()[1]))
 
 
 # ---------------------------------------------------------------------------- #

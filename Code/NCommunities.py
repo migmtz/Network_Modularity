@@ -67,6 +67,11 @@ class NCommunitiesClassifier():
         self.compute_communities(category)
         Q=community.modularity(self.G0,self.communities)
         return Q
+
+    def return_optimal(self):
+        Q=np.max(self.Q_History)
+        N=np.argmax(self.Q_History)
+        return Q,N
     
     def padded_modularity_sequence(self,n):
         pad=[0 for i in range(max(n-len(self.Q_History),0))]
@@ -109,5 +114,13 @@ class NCommunitiesClassifier():
 # clfN=NCommunitiesClassifier(G,DA2communityClassifier)
 # clfN.fit()
 # print(clfN.Q_History)
-# print(clfN.category)
-# plot_communities(G,clfN)
+
+
+# G=networkx.read_gml('./data/polbooks.gml') #find a larger network (does not exceed 4 communities with this one)
+# clfN=NCommunitiesClassifier(G,DA2communityClassifier,10)
+# clfN.fit()
+# print(clfN.Q_History)
+
+
+#Weird: they don t follow the same sequence, even at first! 
+# import ipdb; ipdb.set_trace()
