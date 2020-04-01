@@ -61,6 +61,7 @@ clfN.fit()
 # print(clfN.Q_History)s
 plt.plot(np.arange(1,n+1),clfN.padded_modularity_sequence(n),label="Spectral")
 plt.xlabel("Number of communities")
+plt.ylabel("Modularity")
 plt.legend()
 plt.show()
 
