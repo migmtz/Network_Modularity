@@ -122,5 +122,5 @@ class NCommunitiesClassifier():
 # print(clfN.Q_History)
 
 
-#Weird: they don t follow the same sequence, even at first! 
+#Weird: they don t follow the same sequence, even at the beginning! 
 # import ipdb; ipdb.set_trace()
