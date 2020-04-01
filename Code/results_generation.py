@@ -39,7 +39,7 @@ G_List.append(g_polbooks)
 # --------------------------------- Settings --------------------------------- #
 
 G=networkx.read_gml('./data/polbooks.gml') #find a larger network (does not exceed 4 communities with this one)
-n=6
+n=10
 
 # ----------------------------- Plot construction ---------------------------- #
 
@@ -69,18 +69,18 @@ plt.show()
 # ---------------------------------------------------------------------------- #
 
 for g in G_List:
-    clfN=NCommunitiesClassifier(G,DA2communityClassifier)
+    clfN=NCommunitiesClassifier(g,DA2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
-    clfN=NCommunitiesClassifier(G,Newman2CommunityClassifier)
+    print("Optimal settings for graph %s, classifier DA: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
+    clfN=NCommunitiesClassifier(g,Newman2CommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
-    clfN=NCommunitiesClassifier(G,GN2communityClassifier)
+    print("Optimal settings for graph %s, classifier N06: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
+    clfN=NCommunitiesClassifier(g,GN2communityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
-    clfN=NCommunitiesClassifier(G,SP2CcommunityClassifier)
+    print("Optimal settings for graph %s, classifier GN: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
+    clfN=NCommunitiesClassifier(g,SP2CcommunityClassifier)
     clfN.fit()
-    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(G.name,clfN.Q,len(clfN.Q_History)))
+    print("Optimal settings for graph %s, classifier Spectral: Q=%.3f, N=%d"%(g.name,clfN.Q,len(clfN.Q_History)))
 
 
 # ---------------------------------------------------------------------------- #
